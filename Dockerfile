@@ -1,5 +1,5 @@
 # ── Playwright 공식 Python 이미지 (Chromium 포함) ──────────────────────────
-FROM mcr.microsoft.com/playwright/python:v1.50.0-noble
+FROM mcr.microsoft.com/playwright/python:v1.58.0-noble
 
 WORKDIR /app
 
