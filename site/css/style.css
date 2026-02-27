@@ -1,0 +1,494 @@
+/* ============================================================
+   MyGrade — style.css
+   Dark theme, Chart.js 연동, 탭 UI, 전체 컴포넌트 포함
+   ============================================================ */
+
+:root {
+    --bg:           #090e1a;
+    --surface:      #111827;
+    --surface2:     #1e293b;
+    --surface3:     #2d3748;
+    --text:         #f1f5f9;
+    --muted:        #94a3b8;
+    --accent:       #6366f1;
+    --accent-light: #818cf8;
+    --success:      #10b981;
+    --warning:      #f59e0b;
+    --danger:       #ef4444;
+    --border:       rgba(255,255,255,0.08);
+    --radius:       1rem;
+    --shadow:       0 8px 32px rgba(0,0,0,0.5);
+    --font:         'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    line-height: 1.6;
+    min-height: 100vh;
+    padding: 2rem 1rem;
+}
+
+.container { width: 100%; max-width: 1080px; margin: 0 auto; }
+
+/* ── 헤더 ──────────────────────────────────────────── */
+header { text-align: center; margin-bottom: 3rem; padding: 1rem; }
+.header-logo { font-size: 3rem; margin-bottom: 0.4rem; }
+header h1 {
+    font-size: 2.8rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #818cf8, #6ee7b7);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 0.4rem;
+}
+header p { color: var(--muted); font-size: 1.05rem; }
+
+/* ── 카드 ──────────────────────────────────────────── */
+.card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow);
+}
+.card h2 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 1.1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+}
+.card-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.4rem;
+}
+.card-desc { color: var(--muted); font-size: 0.88rem; margin-bottom: 1.2rem; }
+.card-yonsei {
+    background: linear-gradient(135deg, #1a1f3a 0%, #111827 100%);
+    border-color: rgba(99,102,241,0.25);
+}
+
+/* ── 업로드 존 ─────────────────────────────────────── */
+.upload-zone {
+    background: var(--surface);
+    border: 2px dashed var(--surface3);
+    border-radius: var(--radius);
+    padding: 5rem 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 2rem;
+}
+.upload-zone:hover,
+.upload-zone.dragover {
+    border-color: var(--accent);
+    background: rgba(99,102,241,0.05);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(99,102,241,0.2);
+}
+.upload-icon { font-size: 3.5rem; display: block; margin-bottom: 1rem; }
+.upload-zone h2 { font-size: 1.25rem; margin-bottom: 0.6rem; border: none; padding: 0; }
+.upload-zone p  { color: var(--muted); }
+.upload-hint    { font-size: 0.78rem; margin-top: 1rem !important; }
+
+/* ── 안내 스텝 ─────────────────────────────────────── */
+.instruction-steps { display: flex; flex-direction: column; gap: 1rem; margin-top: 1rem; }
+.step {
+    display: flex;
+    gap: 1rem;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+    padding: 1.2rem 1.5rem;
+}
+.step-number {
+    width: 2.1rem; height: 2.1rem; min-width: 2.1rem;
+    background: var(--accent);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 0.85rem; margin-top: 0.1rem;
+}
+.step-content h3 { color: var(--accent-light); font-size: 1rem; margin-bottom: 0.35rem; }
+.step-content p  { color: var(--muted); font-size: 0.9rem; }
+.step-content a  { color: var(--accent-light); text-decoration: none; }
+.step-content a:hover { text-decoration: underline; }
+kbd {
+    background: var(--surface3);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 0.3rem;
+    padding: 0.1rem 0.45rem;
+    font-size: 0.82rem;
+    font-family: monospace;
+}
+.instruct-img {
+    max-width: 100%; height: auto; display: block;
+    border-radius: 0.5rem; border: 1px solid var(--border); margin-top: 0.75rem;
+}
+.tip-box {
+    background: rgba(245,158,11,0.08);
+    border: 1px solid rgba(245,158,11,0.2);
+    border-radius: 0.5rem;
+    padding: 0.7rem 1rem;
+    color: var(--warning); font-size: 0.85rem; margin-top: 0.75rem;
+}
+
+/* ── 대시보드 상단 바 ──────────────────────────────── */
+.dashboard-topbar {
+    display: flex; align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1.5rem;
+}
+.export-btns { display: flex; gap: 0.75rem; }
+
+/* ── 버튼 ──────────────────────────────────────────── */
+.btn {
+    padding: 0.6rem 1.2rem;
+    border-radius: 0.5rem;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    font-size: 0.88rem; font-weight: 600; font-family: var(--font);
+    transition: all 0.2s ease;
+}
+.btn-ghost { background: transparent; color: var(--muted); }
+.btn-ghost:hover { background: var(--surface2); color: var(--text); }
+.btn-secondary { background: var(--surface2); color: var(--text); border-color: var(--border); }
+.btn-secondary:hover {
+    background: var(--accent); border-color: var(--accent); color: white;
+    transform: translateY(-1px); box-shadow: 0 4px 12px rgba(99,102,241,0.35);
+}
+
+/* ── 점수 카드 3열 ─────────────────────────────────── */
+.score-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.5rem; margin-bottom: 1.5rem;
+}
+.score-row .card { margin-bottom: 0; }
+.big-score {
+    font-size: 3.2rem; font-weight: 800; line-height: 1; margin: 0.4rem 0;
+    background: linear-gradient(135deg, #818cf8, #6ee7b7);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+.score-sub { color: var(--muted); font-size: 0.82rem; margin-bottom: 1rem; }
+
+.score-breakdown { display: flex; flex-direction: column; gap: 0.4rem; margin-top: 0.5rem; }
+.breakdown-item {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0.3rem 0.7rem;
+    background: rgba(255,255,255,0.03); border-radius: 0.4rem;
+}
+.breakdown-label { color: var(--muted); font-size: 0.82rem; }
+.breakdown-val   { font-weight: 700; font-size: 0.92rem; }
+.breakdown-item.danger .breakdown-val { color: var(--danger); }
+
+.gpa-list { display: flex; flex-direction: column; gap: 0.45rem; margin-top: 0.5rem; }
+.gpa-item {
+    display: flex; justify-content: space-between;
+    padding: 0.35rem 0.7rem;
+    background: rgba(255,255,255,0.03); border-radius: 0.4rem;
+}
+.gpa-item span   { color: var(--muted); font-size: 0.88rem; }
+.gpa-item strong { font-size: 0.95rem; }
+
+.pie-wrap { position: relative; height: 185px; margin-top: 0.5rem; }
+
+/* ── 탭 네비게이션 ─────────────────────────────────── */
+.tab-nav {
+    display: flex; gap: 0;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 1.5rem;
+    overflow-x: auto; scrollbar-width: none;
+}
+.tab-nav::-webkit-scrollbar { display: none; }
+.tab-btn {
+    padding: 0.75rem 1.3rem;
+    background: transparent; border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--muted); cursor: pointer;
+    font-size: 0.88rem; font-weight: 600; font-family: var(--font);
+    white-space: nowrap; transition: all 0.2s; margin-bottom: -1px;
+}
+.tab-btn:hover  { color: var(--text); }
+.tab-btn.active { color: var(--accent-light); border-bottom-color: var(--accent-light); }
+
+/* ── 성적표 필터 & 테이블 ───────────────────────────── */
+.table-header {
+    display: flex; align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1rem;
+}
+.table-header h2 { margin: 0; padding: 0; border: none; }
+.table-filters   { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+
+.filter-select {
+    padding: 0.45rem 2rem 0.45rem 0.7rem;
+    background: var(--surface2); border: 1px solid var(--border);
+    color: var(--text); border-radius: 0.45rem;
+    font-size: 0.82rem; font-family: var(--font);
+    cursor: pointer; outline: none; appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2394a3b8' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.4rem center;
+    background-repeat: no-repeat; background-size: 1.1em;
+    transition: border-color 0.2s;
+}
+.filter-select:focus { border-color: var(--accent); }
+
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+thead tr { background: var(--surface2); }
+th {
+    padding: 0.8rem 0.9rem; text-align: left;
+    font-weight: 600; color: var(--muted);
+    font-size: 0.75rem; text-transform: uppercase;
+    letter-spacing: 0.05em; white-space: nowrap;
+}
+td { padding: 0.7rem 0.9rem; border-bottom: 1px solid rgba(255,255,255,0.04); vertical-align: middle; }
+tbody tr { transition: background 0.15s; }
+tbody tr:hover { background: rgba(255,255,255,0.03); }
+.subject-name { font-weight: 500; }
+.kyogwa-cell  { color: var(--muted); font-size: 0.83rem; }
+
+/* 석차 원형 뱃지 */
+.rank-badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 2rem; height: 2rem; border-radius: 50%;
+    font-weight: 700; font-size: 0.88rem; background: var(--surface3);
+}
+.rank-1 { background:#fef3c7; color:#92400e; }
+.rank-2 { background:#e0f2fe; color:#075985; }
+.rank-3 { background:#d1fae5; color:#065f46; }
+.rank-4,.rank-5 { background:#ede9fe; color:#4c1d95; }
+.rank-6,.rank-7 { background:rgba(245,158,11,0.15); color:#f59e0b; }
+.rank-8,.rank-9 { background:rgba(239,68,68,0.15);  color:#ef4444; }
+
+/* 유형 뱃지 */
+.badge {
+    display: inline-block; padding: 0.2rem 0.55rem;
+    border-radius: 0.35rem; font-size: 0.72rem;
+    font-weight: 700; letter-spacing: 0.03em;
+}
+.badge-common  { background: rgba(59,130,246,0.15);  color: #93c5fd; }
+.badge-general { background: rgba(16,185,129,0.15);  color: #6ee7b7; }
+.badge-career  { background: rgba(139,92,246,0.15);  color: #c4b5fd; }
+
+/* ── 차트 영역 ─────────────────────────────────────── */
+.chart-container { position: relative; width: 100%; min-height: 300px; padding: 0.5rem 0; }
+
+/* ── 세특 열람 ─────────────────────────────────────── */
+.seteuk-section { margin-bottom: 2rem; }
+.seteuk-section-title {
+    font-size: 0.75rem; font-weight: 700; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 0.85rem;
+}
+.detail-item {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 0.75rem;
+    padding: 1.2rem 1.4rem; margin-bottom: 1rem;
+}
+.detail-title {
+    display: block; font-size: 0.95rem; font-weight: 700;
+    color: var(--accent-light); margin-bottom: 0.65rem;
+}
+.detail-content {
+    font-size: 0.92rem; color: #d1d5db;
+    white-space: pre-wrap; line-height: 1.85;
+}
+.empty-msg { color: var(--muted); text-align: center; padding: 2.5rem; }
+
+/* ── 바이트 계산기 ─────────────────────────────────── */
+.byte-card { min-height: 420px; }
+.byte-controls { margin-bottom: 1.2rem; }
+.byte-select-label {
+    display: block; font-size: 0.82rem; color: var(--muted);
+    margin-bottom: 0.5rem; font-weight: 500;
+}
+.byte-select {
+    width: 100%;
+    padding: 0.85rem 2.5rem 0.85rem 1rem;
+    background: var(--surface2); border: 1px solid var(--border);
+    color: var(--text); border-radius: 0.5rem;
+    font-size: 0.95rem; font-family: var(--font);
+    outline: none; cursor: pointer; appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2394a3b8' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.75rem center;
+    background-repeat: no-repeat; background-size: 1.2em;
+    transition: border-color 0.2s;
+}
+.byte-select:focus { border-color: var(--accent); }
+.byte-display { animation: fadeIn 0.25s ease; }
+.byte-header {
+    display: flex; justify-content: space-between;
+    align-items: center; margin-bottom: 0.65rem;
+}
+.byte-title { font-size: 0.95rem; font-weight: 700; color: var(--accent-light); }
+.byte-value { font-size: 0.88rem; font-weight: 600; color: var(--muted); }
+
+.progress-container {
+    width: 100%; height: 8px;
+    background: var(--surface3); border-radius: 4px;
+    overflow: hidden; margin-bottom: 1rem;
+}
+.progress-bar {
+    height: 100%; border-radius: 4px;
+    transition: width 0.3s ease, background-color 0.3s ease;
+}
+.progress-safe    { background: var(--success); }
+.progress-warning { background: var(--warning); }
+.progress-danger  { background: var(--danger);  }
+
+.byte-textarea {
+    width: 100%; min-height: 240px;
+    background: rgba(0,0,0,0.25); border: 1px solid var(--border);
+    border-radius: 0.5rem; color: var(--text);
+    padding: 1rem; font-size: 1rem; line-height: 1.75;
+    resize: vertical; font-family: var(--font);
+    transition: border-color 0.2s;
+}
+.byte-textarea:focus { outline: none; border-color: var(--accent); }
+.byte-placeholder { text-align: center; color: var(--muted); padding: 3rem; }
+
+/* ── 유틸리티 ──────────────────────────────────────── */
+.hidden { display: none !important; }
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0);   }
+}
+
+/* ── 푸터 ──────────────────────────────────────────── */
+.footer-disclaimer {
+    text-align: center; color: var(--muted); font-size: 0.83rem;
+    padding: 3rem 1rem; margin-top: 1rem;
+    border-top: 1px solid var(--border);
+}
+
+/* ── 로그인 카드 ────────────────────────────────────── */
+.login-card {
+    background: var(--surface);
+    border: 1px solid rgba(99,102,241,0.3);
+    border-radius: var(--radius);
+    padding: 1.8rem 2rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 0 0 1px rgba(99,102,241,0.1), var(--shadow);
+}
+.login-header {
+    display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 1.4rem;
+}
+.login-icon { font-size: 2rem; line-height: 1; margin-top: 0.1rem; }
+.login-header h2 {
+    font-size: 1.1rem; font-weight: 700; margin-bottom: 0.25rem;
+    color: var(--text); border: none; padding: 0;
+}
+.login-header p  { color: var(--muted); font-size: 0.88rem; }
+
+.login-form { display: flex; gap: 0.75rem; align-items: flex-end; flex-wrap: wrap; }
+.login-fields { display: flex; gap: 0.75rem; flex: 1; min-width: 0; flex-wrap: wrap; }
+.field-wrap { display: flex; flex-direction: column; gap: 0.3rem; flex: 1; min-width: 140px; }
+.field-wrap label {
+    font-size: 0.78rem; font-weight: 600; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.06em;
+}
+.field-wrap input {
+    padding: 0.7rem 1rem;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 0.5rem; color: var(--text);
+    font-size: 0.95rem; font-family: var(--font);
+    outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+}
+.field-wrap input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
+}
+.field-wrap input::placeholder { color: var(--surface3); }
+
+.btn-primary {
+    background: var(--accent);
+    border: none; color: white;
+    padding: 0.72rem 1.6rem;
+    border-radius: 0.5rem; cursor: pointer;
+    font-size: 0.95rem; font-weight: 700; font-family: var(--font);
+    transition: all 0.2s ease;
+    display: flex; align-items: center; gap: 0.5rem;
+    white-space: nowrap;
+}
+.btn-primary:hover:not(:disabled) {
+    background: var(--accent-light);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(99,102,241,0.45);
+}
+.btn-primary:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+
+.login-error {
+    margin-top: 0.85rem;
+    padding: 0.65rem 1rem;
+    background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.25);
+    border-radius: 0.45rem; color: #fca5a5;
+    font-size: 0.87rem;
+}
+.login-note {
+    margin-top: 0.85rem; font-size: 0.78rem; color: var(--surface3);
+}
+
+/* ── 스피너 ─────────────────────────────────────────── */
+.spinner {
+    width: 1rem; height: 1rem;
+    border: 2px solid rgba(255,255,255,0.35);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.65s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── 구분선 ─────────────────────────────────────────── */
+.upload-divider {
+    display: flex; align-items: center; gap: 1rem;
+    color: var(--surface3); font-size: 0.82rem; margin: 1.4rem 0;
+}
+.upload-divider::before,
+.upload-divider::after {
+    content: ''; flex: 1; height: 1px; background: var(--border);
+}
+
+/* ── 반응형 ────────────────────────────────────────── */
+@media (max-width: 640px) {
+    body { padding: 1rem 0.5rem; }
+    header h1 { font-size: 2rem; }
+    .score-row { grid-template-columns: 1fr; }
+    .big-score { font-size: 2.5rem; }
+    .dashboard-topbar { flex-direction: column; align-items: stretch; }
+    .export-btns { justify-content: flex-end; }
+    .table-header { flex-direction: column; align-items: flex-start; }
+}
+
+/* ── 인쇄 ──────────────────────────────────────────── */
+@media print {
+    body { background: white; color: black; padding: 0; }
+    header, #uploadSection, .dashboard-topbar,
+    .tab-nav, .table-filters, .byte-controls, .btn { display: none !important; }
+    .tab-content.hidden { display: block !important; }
+    .card { border: 1px solid #ccc; box-shadow: none; background: white; color: black; page-break-inside: avoid; margin-bottom: 1rem; }
+    .card h2 { color: black; border-color: #ccc; }
+    .detail-item { background: white; border-color: #ccc; }
+    .detail-title   { color: #333 !important; -webkit-text-fill-color: #333; }
+    .detail-content { color: #444 !important; }
+    table { font-size: 9px; }
+    th { background: #eee !important; color: black !important; }
+    td { color: black !important; border-color: #ddd !important; }
+    .big-score { -webkit-text-fill-color: black; background: none; color: black; }
+    .badge { border: 1px solid #ccc; color: black !important; background: #f5f5f5 !important; }
+    .rank-badge { color: black !important; background: #f5f5f5 !important; }
+}

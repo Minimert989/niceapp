@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyGrade — 내신 산출기</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <!--
+      API_BASE_URL: 백엔드 서버 주소
+      - 로컬(same-origin): ''  ← 기본값, server.py와 함께 쓸 때
+      - 분리 배포 시: 'https://mygrade-api.railway.app'
+    -->
+    <script>window.API_BASE_URL = '';</script>
+</head>
+<body>
+
+<header>
+    <div class="header-logo">📊</div>
+    <h1>MyGrade</h1>
+    <p>나이스 생활기록부 HTML 파일 하나로 끝내는 내신 분석</p>
+</header>
+
+<div class="container">
+
+    <!-- ── 업로드 섹션 ─────────────────────────────────────────── -->
+    <div id="uploadSection">
+
+        <!-- ── 로그인으로 자동 불러오기 ─────────────────────────────── -->
+        <div class="login-card" id="loginCard">
+            <div class="login-header">
+                <span class="login-icon">🔑</span>
+                <div>
+                    <h2>나이스 아이디로 자동 불러오기</h2>
+                    <p>나이스 플러스(neisplus.kr) 학생 계정으로 바로 분석합니다</p>
+                </div>
+            </div>
+            <div class="login-form">
+                <div class="login-fields">
+                    <div class="field-wrap">
+                        <label for="loginId">아이디</label>
+                        <input type="text"     id="loginId" placeholder="나이스 학생 아이디" autocomplete="username">
+                    </div>
+                    <div class="field-wrap">
+                        <label for="loginPw">비밀번호</label>
+                        <input type="password" id="loginPw" placeholder="비밀번호" autocomplete="current-password">
+                    </div>
+                </div>
+                <button id="loginBtn" class="btn btn-primary">
+                    <span id="loginBtnText">자동 불러오기</span>
+                    <span id="loginSpinner" class="spinner hidden"></span>
+                </button>
+            </div>
+            <p id="loginError" class="login-error hidden"></p>
+            <p class="login-note">🔒 아이디/비밀번호는 로컬 서버에서만 처리되며 외부로 전송되지 않습니다.</p>
+        </div>
+
+        <div class="upload-divider"><span>또는 HTML 파일로 직접 업로드</span></div>
+
+        <div class="upload-zone" id="dropZone">
+            <span class="upload-icon">📂</span>
+            <h2>파일을 여기로 드래그하거나 클릭해서 선택</h2>
+            <p>나이스(NEIS)에서 저장한 생기부 HTML 파일을 업로드하세요</p>
+            <p class="upload-hint">🔒 모든 분석은 브라우저 내에서만 처리되며 서버로 전송되지 않습니다.</p>
+            <input type="file" id="fileInput" accept=".html,.htm" hidden>
+        </div>
+
+        <div class="card">
+            <h2>📄 HTML 파일 준비 방법</h2>
+            <div class="instruction-steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>나이스 플러스 접속</h3>
+                        <p><a href="https://neisplus.kr/" target="_blank">neisplus.kr</a>에 로그인합니다.</p>
+                        <img src="images/instruct1.png" alt="로그인 화면 예시" class="instruct-img">
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>생활기록부 전체 선택</h3>
+                        <p>학교생활기록부 메뉴에서 항목을 <strong>전체선택</strong> 체크 후 조회합니다.</p>
+                        <img src="images/instruct2.png" alt="전체선택 화면 예시" class="instruct-img">
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3>파일 저장</h3>
+                        <p><kbd>Ctrl+S</kbd> (Mac: <kbd>Cmd+S</kbd>) → <strong>웹페이지(HTML만)</strong>으로 저장</p>
+                        <div class="tip-box">💡 저장된 파일 이름이 <strong>.html</strong>로 끝나는지 확인하세요.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- /uploadSection -->
+
+    <!-- ── 대시보드 (처음엔 숨김) ──────────────────────────────── -->
+    <div id="dashboard" class="hidden">
+
+        <!-- 상단 버튼 바 -->
+        <div class="dashboard-topbar">
+            <button id="backBtn" class="btn btn-ghost">← 다른 파일 업로드</button>
+            <div class="export-btns">
+                <button id="btnDownloadTxt" class="btn btn-secondary">💾 TXT 저장</button>
+                <button id="btnPrint"       class="btn btn-secondary">🖨 인쇄 / PDF</button>
+            </div>
+        </div>
+
+        <!-- 점수 요약 카드 3열 -->
+        <div class="score-row">
+
+            <!-- 연세대 환산점수 -->
+            <div class="card card-yonsei">
+                <div class="card-label">연세대학교 교과전형 환산점수</div>
+                <div class="big-score" id="yonseiScore">–</div>
+                <div class="score-sub">100점 만점</div>
+                <div class="score-breakdown">
+                    <div class="breakdown-item">
+                        <span class="breakdown-label">공통 (30%)</span>
+                        <span class="breakdown-val" id="yonseiCommon">0.00</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span class="breakdown-label">일반 (50%)</span>
+                        <span class="breakdown-val" id="yonseiGeneral">0.00</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span class="breakdown-label">진로 (20%)</span>
+                        <span class="breakdown-val" id="yonseiCareer">0.00</span>
+                    </div>
+                    <div class="breakdown-item danger">
+                        <span class="breakdown-label">감점</span>
+                        <span class="breakdown-val" id="yonseiPenalty">0.00</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 단순 평균등급 -->
+            <div class="card">
+                <div class="card-label">단순 평균등급</div>
+                <div class="big-score" id="gpaAll">–</div>
+                <div class="score-sub">전과목 평균</div>
+                <div class="gpa-list">
+                    <div class="gpa-item"><span>국·영·수</span><strong id="gpaKem">–</strong></div>
+                    <div class="gpa-item"><span>국·영·수·과</span><strong id="gpaKems">–</strong></div>
+                    <div class="gpa-item"><span>국·영·수·사·과</span><strong id="gpaKemss">–</strong></div>
+                </div>
+            </div>
+
+            <!-- 연세대 구성 파이차트 -->
+            <div class="card">
+                <div class="card-label">연세대 점수 구성</div>
+                <div class="pie-wrap">
+                    <canvas id="yonseiPieChart"></canvas>
+                </div>
+            </div>
+
+        </div><!-- /score-row -->
+
+        <!-- 탭 네비게이션 -->
+        <div class="tab-nav">
+            <button class="tab-btn active" data-tab="grades">📋 성적표</button>
+            <button class="tab-btn"        data-tab="chart" >📈 시각화</button>
+            <button class="tab-btn"        data-tab="seteuk">📝 세특 열람</button>
+            <button class="tab-btn"        data-tab="byte"  >⚖️ 바이트 계산기</button>
+        </div>
+
+        <!-- ── 탭 1: 성적표 ──────────────────────────────────────── -->
+        <div id="tab-grades" class="tab-content">
+            <div class="card">
+                <div class="table-header">
+                    <h2>상세 성적표</h2>
+                    <div class="table-filters">
+                        <select id="filterSemester" class="filter-select">
+                            <option value="">전체 학기</option>
+                        </select>
+                        <select id="filterCategory" class="filter-select">
+                            <option value="">전체 교과</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>학기</th>
+                                <th>교과</th>
+                                <th>과목</th>
+                                <th>단위</th>
+                                <th>등급</th>
+                                <th>성취도</th>
+                                <th>원점수</th>
+                                <th>평균</th>
+                                <th>표준편차</th>
+                                <th>유형</th>
+                            </tr>
+                        </thead>
+                        <tbody id="gradeTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── 탭 2: 시각화 ──────────────────────────────────────── -->
+        <div id="tab-chart" class="tab-content hidden">
+            <div class="card">
+                <h2>과목별 석차등급</h2>
+                <p class="card-desc">Y축 숫자가 낮을수록(1등급에 가까울수록) 우수합니다.</p>
+                <div class="chart-container">
+                    <canvas id="gradeBarChart"></canvas>
+                </div>
+            </div>
+            <div class="card">
+                <h2>학기별 가중 평균등급 추이</h2>
+                <div class="chart-container">
+                    <canvas id="semesterLineChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── 탭 3: 세특 열람 ───────────────────────────────────── -->
+        <div id="tab-seteuk" class="tab-content hidden">
+            <div class="card">
+                <h2>세부능력 및 특기사항 / 행동특성 종합의견</h2>
+                <div id="seteukContainer">
+                    <p class="empty-msg">파일을 업로드하면 내용이 표시됩니다.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── 탭 4: 바이트 계산기 ───────────────────────────────── -->
+        <div id="tab-byte" class="tab-content hidden">
+            <div class="card byte-card">
+                <h2>생기부 바이트 계산기</h2>
+                <p class="card-desc">NEIS 기준 — 한글 3B · 줄바꿈(Enter) 2B · 영문/숫자/특수 1B</p>
+
+                <div class="byte-controls">
+                    <label class="byte-select-label" for="byteSelector">항목 선택</label>
+                    <select id="byteSelector" class="byte-select">
+                        <option value="" disabled selected>항목을 선택하세요</option>
+                    </select>
+                </div>
+
+                <div id="byteDisplay" class="byte-display hidden">
+                    <div class="byte-header">
+                        <span id="byteLabelTitle" class="byte-title">–</span>
+                        <span id="byteValueText"  class="byte-value">0 / 1500 Byte</span>
+                    </div>
+                    <div class="progress-container">
+                        <div id="byteProgressBar" class="progress-bar progress-safe"></div>
+                    </div>
+                    <textarea
+                        id="byteTextarea"
+                        class="byte-textarea"
+                        placeholder="내용을 입력하거나 파일을 업로드하세요."
+                    ></textarea>
+                </div>
+
+                <div id="bytePlaceholder" class="byte-placeholder">
+                    위 목록에서 항목을 선택하면 내용이 표시됩니다.
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-disclaimer">
+            본 계산기는 참고용이며 실제 입시 결과와 다를 수 있습니다. 정확한 사정은 각 대학 모집요강을 확인하세요.
+        </div>
+
+    </div><!-- /dashboard -->
+
+</div><!-- /container -->
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
