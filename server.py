@@ -107,15 +107,13 @@ async def scrape_neis_html(user_id: str, password: str) -> str:
 
             # ── 4. 로그인 클릭 & 리다이렉트 대기 ─────────────────────────
             print("[4] 로그인 시도 중...")
+            await page.get_by_role("button", name="학생 로그인").click()
             try:
-                async with page.expect_navigation(
-                    url="**/csp-std/**", timeout=20_000
-                ):
-                    await page.get_by_role("button", name="학생 로그인").click()
+                # 로그인 성공 시 neisplus.kr/csp-std/ 로 리다이렉트됨 (최대 40초)
+                await page.wait_for_url("**/csp-std/**", timeout=40_000)
             except Exception:
                 # 아직 로그인 페이지에 머물러 있으면 인증 실패
                 if any(k in page.url for k in ("login.do", "SCSP_CLOUD", "oauth")):
-                    # 오류 메시지가 있으면 추출
                     err_msg = await page.evaluate(
                         "() => document.querySelector('.error-msg, .alert, [class*=error]')?.textContent?.trim() || ''"
                     )
